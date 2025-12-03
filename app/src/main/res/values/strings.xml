@@ -4,4 +4,8 @@
     <string name="error_network">Network error: %1$s</string>
     <string name="error_unexpected">Unexpected error: %1$s</string>
     <string name="title_chat">Dynamic Chat</string>
+    <string name="chat_input_placeholder">Type a message…</string>
+    <string name="chat_send">Send</string>
+    <string name="status_network">Network status: %1$s</string>
+    <string name="chat_empty_state">No messages yet. Say hi! 👋</string>
 </resources>
