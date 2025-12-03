@@ -120,7 +120,6 @@ fun ChatScreen() {
     }
 }
 
-
 @Composable
 fun MessageInputBar(
     text: String,
