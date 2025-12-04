@@ -24,8 +24,7 @@ import com.alex.dynamicchat.core.network.NetworkStatus
 import com.alex.dynamicchat.core.providers.ResourceProvider
 import com.alex.dynamicchat.features.chat.presentation.ui.modes.ChatLayoutMode
 import com.alex.dynamicchat.features.chat.presentation.ui.modes.ThemeMode
-import com.alex.dynamicchat.ui.theme.DeepBlue
-import com.alex.dynamicchat.ui.theme.White
+import com.alex.dynamicchat.features.chat.presentation.ui.theme.LocalChatThemeColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,12 +36,14 @@ fun ChatTopBar(
     onLayoutModeChanged: (ChatLayoutMode) -> Unit,
     onThemeModeChanged: (ThemeMode) -> Unit
 ) {
+    val colors = LocalChatThemeColors.current
+
     TopAppBar(
         title = {
             Column {
                 Text(
                     text = resourceProvider.getString(R.string.title_chat),
-                    color = White
+                    color = colors.appBarContent
                 )
                 Text(
                     text = resourceProvider.getString(
@@ -50,14 +51,14 @@ fun ChatTopBar(
                         networkStatus
                     ),
                     style = MaterialTheme.typography.labelSmall,
-                    color = White.copy(alpha = 0.7f)
+                    color = colors.textSecondary
                 )
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = DeepBlue,
-            titleContentColor = White,
-            actionIconContentColor = White
+            containerColor = colors.appBar,
+            titleContentColor = colors.appBarContent,
+            actionIconContentColor = colors.appBarContent
         ),
         actions = {
             LayoutModeMenu(
@@ -78,13 +79,13 @@ private fun LayoutModeMenu(
     onModeSelected: (ChatLayoutMode) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-
+    val colors = LocalChatThemeColors.current
     Box {
         IconButton(onClick = { expanded = true }) {
             Icon(
                 imageVector = Icons.Default.ViewAgenda,
                 contentDescription = "Change layout",
-                tint = White
+                tint = colors.appBarContent
             )
         }
         DropdownMenu(
@@ -122,13 +123,13 @@ private fun ThemeModeMenu(
     onModeSelected: (ThemeMode) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-
+    val colors = LocalChatThemeColors.current
     Box {
         IconButton(onClick = { expanded = true }) {
             Icon(
                 imageVector = Icons.Default.ColorLens,
                 contentDescription = "Change theme",
-                tint = White
+                tint = colors.appBarContent
             )
         }
         DropdownMenu(

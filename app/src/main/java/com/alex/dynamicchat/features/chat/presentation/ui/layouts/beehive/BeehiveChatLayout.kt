@@ -28,11 +28,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.alex.dynamicchat.features.chat.presentation.ui.DateUtils
 import com.alex.dynamicchat.features.chat.presentation.ui.models.MessageUi
+import com.alex.dynamicchat.features.chat.presentation.ui.theme.LocalChatThemeColors
 import com.alex.dynamicchat.ui.Dimensions.paddingMedium
 import com.alex.dynamicchat.ui.Dimensions.paddingSmall
-import com.alex.dynamicchat.ui.theme.DeepBlue
-import com.alex.dynamicchat.ui.theme.StormGray
-import com.alex.dynamicchat.ui.theme.White
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -96,12 +94,13 @@ private fun HexTile(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val tileColor = if (message.isMe) DeepBlue else StormGray
+    val colors = LocalChatThemeColors.current
+    val tileColor = if (message.isMe) colors.bubbleMe else colors.bubbleOther
 
     Box(
         modifier = modifier
             .size(96.dp)
-            .clip(RoundedCornerShape(16.dp)) //  plug a true HexagonShape
+            .clip(RoundedCornerShape(16.dp))
             .background(tileColor)
             .clickable(onClick = onClick)
             .padding(8.dp),
@@ -110,7 +109,7 @@ private fun HexTile(
         Text(
             text = message.senderName.take(6),
             style = MaterialTheme.typography.labelMedium,
-            color = White
+            color = colors.textPrimary
         )
     }
 }

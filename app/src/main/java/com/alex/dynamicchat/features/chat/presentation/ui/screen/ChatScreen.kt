@@ -16,13 +16,13 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alex.dynamicchat.R
 import com.alex.dynamicchat.core.providers.ResourceProvider
@@ -34,10 +34,11 @@ import com.alex.dynamicchat.features.chat.presentation.ui.layouts.beehive.Beehiv
 import com.alex.dynamicchat.features.chat.presentation.ui.layouts.classic.ClassicChatLayout
 import com.alex.dynamicchat.features.chat.presentation.ui.layouts.compact.CompactChatLayout
 import com.alex.dynamicchat.features.chat.presentation.ui.modes.ChatLayoutMode
+import com.alex.dynamicchat.features.chat.presentation.ui.theme.LocalChatThemeColors
+import com.alex.dynamicchat.features.chat.presentation.ui.theme.chatColorsFor
 import com.alex.dynamicchat.features.chat.presentation.viewmodel.ChatViewModel
 import com.alex.dynamicchat.ui.Dimensions.paddingMedium
 import com.alex.dynamicchat.ui.Dimensions.paddingSmall
-import com.alex.dynamicchat.ui.theme.DarkBackground
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,67 +54,54 @@ fun ChatScreen() {
     val themeMode by viewModel.themeMode.collectAsState()
 
     val snackBarHostState = remember { SnackbarHostState() }
-
     LaunchedEffect(key1 = viewModel.errorEvent) {
-        viewModel.errorEvent.collect { errorMessage ->
-            snackBarHostState.showSnackbar(errorMessage)
-        }
+        viewModel.errorEvent.collect { snackBarHostState.showSnackbar(it) }
     }
 
-    val isSending = chatState is ChatState.Sending
+    val chatColors = remember(themeMode) { chatColorsFor(themeMode) }
 
-    Scaffold(
-        containerColor = DarkBackground,
-        topBar = {
-            ChatTopBar(
-                resourceProvider = resourceProvider,
-                networkStatus = networkStatus,
-                layoutMode = layoutMode,
-                themeMode = themeMode,
-                onLayoutModeChanged = viewModel::onLayoutModeChanged,
-                onThemeModeChanged = viewModel::onThemeModeChanged
-            )
-        },
-        snackbarHost = { SnackbarHost(snackBarHostState) },
-        bottomBar = {
-            MessageInputBar(
-                text = inputText,
-                isSending = isSending,
-                resourceProvider = resourceProvider,
-                onTextChange = { newText ->
-                    viewModel.onEvent(ChatEvent.MessageInputChanged(newText))
-                },
-                onSendClicked = {
-                    viewModel.onEvent(ChatEvent.SendMessage)
-                }
-            )
-        }
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .background(DarkBackground)
-        ) {
-            if (messages.isEmpty()) {
-                // theme-aware empty state
-                ChatEmptyState(resourceProvider = resourceProvider)
-            } else {
-                when (layoutMode) {
-                    ChatLayoutMode.CLASSIC -> ClassicChatLayout(
-                        messages = messages,
-                        modifier = Modifier.fillMaxSize()
-                    )
+    CompositionLocalProvider(LocalChatThemeColors provides chatColors) {
+        val colors = LocalChatThemeColors.current
 
-                    ChatLayoutMode.COMPACT -> CompactChatLayout(
-                        messages = messages,
-                        modifier = Modifier.fillMaxSize()
-                    )
+        val isSending = chatState is ChatState.Sending
 
-                    ChatLayoutMode.BEEHIVE -> BeehiveChatLayout(
-                        messages = messages,
-                        modifier = Modifier.fillMaxSize()
-                    )
+        Scaffold(
+            containerColor = colors.background,
+            topBar = {
+                ChatTopBar(
+                    resourceProvider = resourceProvider,
+                    networkStatus = networkStatus,
+                    layoutMode = layoutMode,
+                    themeMode = themeMode,
+                    onLayoutModeChanged = viewModel::onLayoutModeChanged,
+                    onThemeModeChanged = viewModel::onThemeModeChanged
+                )
+            },
+            snackbarHost = { SnackbarHost(snackBarHostState) },
+            bottomBar = {
+                MessageInputBar(
+                    text = inputText,
+                    isSending = isSending,
+                    resourceProvider = resourceProvider,
+                    onTextChange = { viewModel.onEvent(ChatEvent.MessageInputChanged(it)) },
+                    onSendClicked = { viewModel.onEvent(ChatEvent.SendMessage) }
+                )
+            }
+        ) { paddingValues ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .background(colors.background)
+            ) {
+                if (messages.isEmpty()) {
+                    ChatEmptyState(resourceProvider = resourceProvider)
+                } else {
+                    when (layoutMode) {
+                        ChatLayoutMode.CLASSIC -> ClassicChatLayout(messages, Modifier.fillMaxSize())
+                        ChatLayoutMode.COMPACT -> CompactChatLayout(messages, Modifier.fillMaxSize())
+                        ChatLayoutMode.BEEHIVE -> BeehiveChatLayout(messages, Modifier.fillMaxSize())
+                    }
                 }
             }
         }
@@ -129,6 +117,8 @@ fun MessageInputBar(
     onSendClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val colors = LocalChatThemeColors.current
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -143,31 +133,28 @@ fun MessageInputBar(
             placeholder = {
                 Text(
                     text = resourceProvider.getString(R.string.chat_input_placeholder),
-                    color = White.copy(alpha = 0.5f)
+                    color = colors.textSecondary
                 )
             },
             singleLine = true,
-
             colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = White,
-                unfocusedTextColor = White,
-                cursorColor = White,
-                focusedBorderColor = White,
-                unfocusedBorderColor = White.copy(alpha = 0.4f),
-                focusedPlaceholderColor = White.copy(alpha = 0.5f),
-                unfocusedPlaceholderColor = White.copy(alpha = 0.5f)
+                focusedTextColor = colors.textPrimary,
+                unfocusedTextColor = colors.textPrimary,
+                cursorColor = colors.textPrimary,
+                focusedBorderColor = colors.textSecondary,
+                unfocusedBorderColor = colors.textSecondary.copy(alpha = 0.5f),
+                focusedPlaceholderColor = colors.textSecondary,
+                unfocusedPlaceholderColor = colors.textSecondary
             )
         )
-
         Button(
             onClick = onSendClicked,
             enabled = text.isNotBlank() && !isSending
         ) {
             Text(
                 text = resourceProvider.getString(R.string.chat_send),
-                color = White
+                color = colors.textPrimary
             )
         }
     }
 }
-

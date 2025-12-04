@@ -9,14 +9,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.alex.dynamicchat.R
 import com.alex.dynamicchat.core.providers.ResourceProvider
+import com.alex.dynamicchat.features.chat.presentation.ui.theme.LocalChatThemeColors
 import com.alex.dynamicchat.ui.Dimensions.paddingMedium
-import com.alex.dynamicchat.ui.theme.White
 
 @Composable
 fun ChatEmptyState(
     resourceProvider: ResourceProvider,
     modifier: Modifier = Modifier
 ) {
+    val colors = LocalChatThemeColors.current
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -25,7 +27,7 @@ fun ChatEmptyState(
     ) {
         Text(
             text = resourceProvider.getString(R.string.chat_empty_state),
-            color = White
+            color = colors.textSecondary
         )
     }
 }
