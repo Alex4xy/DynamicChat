@@ -14,23 +14,21 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.alex.dynamicchat.features.chat.presentation.ui.DateUtils
 import com.alex.dynamicchat.features.chat.presentation.ui.models.MessageUi
+import com.alex.dynamicchat.features.chat.presentation.ui.theme.LocalChatThemeColors
 import com.alex.dynamicchat.ui.Dimensions.paddingSmall
-import com.alex.dynamicchat.ui.theme.DeepBlue
-import com.alex.dynamicchat.ui.theme.StormGray
-import com.alex.dynamicchat.ui.theme.White
 
 @Composable
 fun ClassicMessageBubble(
     message: MessageUi,
     modifier: Modifier = Modifier
 ) {
-    val bubbleColor = if (message.isMe) DeepBlue else StormGray
-    val alignment =
-        if (message.isMe) Arrangement.End else Arrangement.Start
+    val colors = LocalChatThemeColors.current
+
+    val bubbleColor = if (message.isMe) colors.bubbleMe else colors.bubbleOther
+    val alignment = if (message.isMe) Arrangement.End else Arrangement.Start
 
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -53,13 +51,13 @@ fun ClassicMessageBubble(
             Text(
                 text = message.senderName,
                 style = MaterialTheme.typography.labelSmall,
-                color = White.copy(alpha = 0.7f)
+                color = colors.textSecondary
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = message.text,
                 style = MaterialTheme.typography.bodyMedium,
-                color = White
+                color = colors.textPrimary
             )
             Spacer(modifier = Modifier.height(2.dp))
             Row(
@@ -69,13 +67,13 @@ fun ClassicMessageBubble(
                 Text(
                     text = DateUtils.formatTime(message.timestamp),
                     style = MaterialTheme.typography.labelSmall,
-                    color = White.copy(alpha = 0.6f)
+                    color = colors.textSecondary
                 )
                 if (message.isUnread && !message.isMe) {
                     Text(
                         text = "UNREAD",
                         style = MaterialTheme.typography.labelSmall,
-                        color = Color.Yellow
+                        color = colors.unread
                     )
                 }
             }
