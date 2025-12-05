@@ -11,16 +11,17 @@ data class MessageDto(
     val isUnread: Boolean?
 )
 
-
 fun MessageDto.toDomain(currentUserId: String): Message {
+    val safeSenderId = senderId.orEmpty()
+
     return Message(
-        id = id ?: 0L,
-        senderId = senderId.orEmpty(),
+        id = id ?: System.currentTimeMillis(),
+        senderId = safeSenderId,
         senderName = senderName.orEmpty(),
-        isMe = senderId == currentUserId,
+        isMe = safeSenderId == currentUserId,
         text = text.orEmpty(),
         timestamp = timestamp ?: System.currentTimeMillis(),
-        isUnread = isUnread ?: false
+        isUnread = false
     )
 }
 

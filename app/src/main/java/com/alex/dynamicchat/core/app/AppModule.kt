@@ -13,7 +13,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-val Context.homeDataStore: DataStore<Preferences> by preferencesDataStore(name = "home_data_store")
+val Context.chatDataStore: DataStore<Preferences> by preferencesDataStore(name = "chat_data_store")
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -33,8 +33,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideHomeDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
-        return context.homeDataStore
+    fun provideChatDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
+        return context.chatDataStore
     }
 
 }

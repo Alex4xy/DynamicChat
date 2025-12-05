@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
@@ -25,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alex.dynamicchat.R
+import com.alex.dynamicchat.core.network.NetworkStatus
 import com.alex.dynamicchat.core.providers.ResourceProvider
 import com.alex.dynamicchat.features.chat.presentation.event.ChatEvent
 import com.alex.dynamicchat.features.chat.presentation.state.ChatState
@@ -44,8 +47,8 @@ import com.alex.dynamicchat.ui.Dimensions.paddingSmall
 @Composable
 fun ChatScreen() {
     val viewModel: ChatViewModel = hiltViewModel()
-    val resourceProvider = viewModel.resourceProvider
 
+    val resourceProvider = viewModel.resourceProvider
     val networkStatus = viewModel.networkStatus.collectAsState().value
     val chatState by viewModel.state.collectAsState()
     val inputText by viewModel.messageInput.collectAsState()
@@ -53,9 +56,31 @@ fun ChatScreen() {
     val layoutMode by viewModel.layoutMode.collectAsState()
     val themeMode by viewModel.themeMode.collectAsState()
 
+    val classicListState = rememberLazyListState()
+    val compactListState = rememberLazyListState()
+    val beehiveScrollState = rememberScrollState()
+
     val snackBarHostState = remember { SnackbarHostState() }
     LaunchedEffect(key1 = viewModel.errorEvent) {
         viewModel.errorEvent.collect { snackBarHostState.showSnackbar(it) }
+    }
+
+    LaunchedEffect(messages.size, layoutMode) {
+        if (messages.isNotEmpty()) {
+            when (layoutMode) {
+                ChatLayoutMode.CLASSIC -> {
+                    classicListState.animateScrollToItem(messages.lastIndex)
+                }
+
+                ChatLayoutMode.COMPACT -> {
+                    compactListState.animateScrollToItem(messages.lastIndex)
+                }
+
+                ChatLayoutMode.BEEHIVE -> {
+                    beehiveScrollState.animateScrollTo(beehiveScrollState.maxValue)
+                }
+            }
+        }
     }
 
     val chatColors = remember(themeMode) { chatColorsFor(themeMode) }
@@ -64,6 +89,13 @@ fun ChatScreen() {
         val colors = LocalChatThemeColors.current
 
         val isSending = chatState is ChatState.Sending
+        val isError = chatState is ChatState.Error
+        val isNetworkAvailable = networkStatus == NetworkStatus.Available
+
+        val canSend = inputText.isNotBlank() &&
+                !isSending &&
+                isNetworkAvailable &&
+                !isError
 
         Scaffold(
             containerColor = colors.background,
@@ -81,7 +113,7 @@ fun ChatScreen() {
             bottomBar = {
                 MessageInputBar(
                     text = inputText,
-                    isSending = isSending,
+                    isEnabled = canSend,
                     resourceProvider = resourceProvider,
                     onTextChange = { viewModel.onEvent(ChatEvent.MessageInputChanged(it)) },
                     onSendClicked = { viewModel.onEvent(ChatEvent.SendMessage) }
@@ -98,9 +130,21 @@ fun ChatScreen() {
                     ChatEmptyState(resourceProvider = resourceProvider)
                 } else {
                     when (layoutMode) {
-                        ChatLayoutMode.CLASSIC -> ClassicChatLayout(messages, Modifier.fillMaxSize())
-                        ChatLayoutMode.COMPACT -> CompactChatLayout(messages, Modifier.fillMaxSize())
-                        ChatLayoutMode.BEEHIVE -> BeehiveChatLayout(messages, Modifier.fillMaxSize())
+                        ChatLayoutMode.CLASSIC -> ClassicChatLayout(
+                            messages = messages,
+                            modifier = Modifier.fillMaxSize(),
+                            listState = classicListState
+                        )
+                        ChatLayoutMode.COMPACT -> CompactChatLayout(
+                            messages = messages,
+                            modifier = Modifier.fillMaxSize(),
+                            listState = compactListState
+                        )
+                        ChatLayoutMode.BEEHIVE -> BeehiveChatLayout(
+                            messages = messages,
+                            modifier = Modifier.fillMaxSize(),
+                            scrollState = beehiveScrollState
+                        )
                     }
                 }
             }
@@ -111,7 +155,7 @@ fun ChatScreen() {
 @Composable
 fun MessageInputBar(
     text: String,
-    isSending: Boolean,
+    isEnabled: Boolean,
     resourceProvider: ResourceProvider,
     onTextChange: (String) -> Unit,
     onSendClicked: () -> Unit,
@@ -149,7 +193,7 @@ fun MessageInputBar(
         )
         Button(
             onClick = onSendClicked,
-            enabled = text.isNotBlank() && !isSending
+            enabled = isEnabled
         ) {
             Text(
                 text = resourceProvider.getString(R.string.chat_send),

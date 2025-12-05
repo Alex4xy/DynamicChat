@@ -3,72 +3,58 @@ package com.alex.dynamicchat.features.chat.presentation.ui.layouts.beehive
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
-import kotlin.math.max
+import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.unit.Constraints
+import com.alex.dynamicchat.features.chat.presentation.ui.models.MessageUi
 
 @Composable
 fun BeehiveLayout(
+    messages: List<MessageUi>,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
+    content: @Composable (MessageUi) -> Unit
 ) {
     Layout(
         modifier = modifier,
-        content = content
+        content = { messages.forEach { content(it) } }
     ) { measurables, constraints ->
-        val tileConstraints = constraints.copy(
-            minWidth = 0,
-            minHeight = 0
-        )
 
-        val placeables = measurables.map { it.measure(tileConstraints) }
+        val tileWidth = constraints.maxWidth / 2
+        val tileHeight = (tileWidth * 0.85f).toInt()
 
-        if (placeables.isEmpty()) {
-            return@Layout layout(
-                width = constraints.minWidth,
-                height = constraints.minHeight
-            ) {}
+        val verticalStep = (tileHeight * 0.75f).toInt()
+
+        val positions = mutableListOf<Placeable>()
+        val coords = mutableListOf<Pair<Int, Int>>()
+
+        measurables.forEachIndexed { index, measurable ->
+            val message = messages[index]
+            val placeable = measurable.measure(
+                Constraints.fixed(tileWidth, tileHeight)
+            )
+            positions += placeable
+
+            val isMe = message.isMe
+
+            val offsetX = if (isMe) {
+                constraints.maxWidth - tileWidth
+            } else {
+                0
+            }
+
+            val staggerShift = if (index % 2 == 0) 0 else tileWidth / 4
+
+            val finalX = offsetX + if (isMe) -staggerShift else staggerShift
+            val finalY = index * verticalStep
+
+            coords += finalX to finalY
         }
 
-        val tileWidth = placeables.first().width
-        val tileHeight = placeables.first().height
+        val finalHeight = coords.last().second + tileHeight
 
-        val horizontalSpacing = (tileWidth * 0.2f).toInt()
-        val verticalSpacing = (tileHeight * 0.1f).toInt()
-
-        val effectiveTileWidth = tileWidth + horizontalSpacing
-        val effectiveTileHeight = tileHeight + verticalSpacing
-
-        val maxWidth = constraints.maxWidth
-        val itemsPerRow = max(1, maxWidth / effectiveTileWidth)
-
-        var x: Int
-        var y = 0
-        var row = 0
-
-        val positions = mutableListOf<Pair<Int, Int>>()
-
-        placeables.forEachIndexed { index, _ ->
-            val column = index % itemsPerRow
-            row = index / itemsPerRow
-            val offsetX = if (row % 2 == 0) 0 else effectiveTileWidth / 2
-
-            x = column * effectiveTileWidth + offsetX
-            y = row * (effectiveTileHeight * 0.8f).toInt()
-
-            positions += x to y
-        }
-
-        val layoutHeight = (y + tileHeight + verticalSpacing)
-            .coerceAtLeast(constraints.minHeight)
-
-        layout(
-            width = maxWidth,
-            height = layoutHeight
-        ) {
-            placeables.forEachIndexed { index, placeable ->
-                val (px, py) = positions[index]
-                placeable.place(px, py)
+        layout(constraints.maxWidth, finalHeight) {
+            positions.forEachIndexed { i, placeable ->
+                placeable.place(coords[i].first, coords[i].second)
             }
         }
     }
 }
-

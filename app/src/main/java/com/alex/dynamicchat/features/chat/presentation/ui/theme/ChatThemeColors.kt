@@ -46,6 +46,7 @@ fun chatColorsFor(themeMode: ThemeMode): ChatThemeColors {
             bubbleOther = Color(0xFFE0E0E0),
             unread = Color(0xFFD32F2F)
         )
+
         ThemeMode.DARK -> ChatThemeColors(
             background = DarkBackground,
             appBar = DeepBlue,
@@ -56,6 +57,7 @@ fun chatColorsFor(themeMode: ThemeMode): ChatThemeColors {
             bubbleOther = StormGray,
             unread = Color.Yellow
         )
+
         ThemeMode.HIGH_CONTRAST -> ChatThemeColors(
             background = Color.Black,
             appBar = Color.Black,
