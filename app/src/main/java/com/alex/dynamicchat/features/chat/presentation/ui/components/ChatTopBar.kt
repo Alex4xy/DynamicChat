@@ -1,8 +1,13 @@
 package com.alex.dynamicchat.features.chat.presentation.ui.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.ViewAgenda
 import androidx.compose.material3.DropdownMenu
@@ -19,6 +24,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import com.alex.dynamicchat.R
 import com.alex.dynamicchat.core.network.NetworkStatus
 import com.alex.dynamicchat.core.providers.ResourceProvider
@@ -80,6 +89,7 @@ private fun LayoutModeMenu(
 ) {
     var expanded by remember { mutableStateOf(false) }
     val colors = LocalChatThemeColors.current
+
     Box {
         IconButton(onClick = { expanded = true }) {
             Icon(
@@ -88,31 +98,40 @@ private fun LayoutModeMenu(
                 tint = colors.appBarContent
             )
         }
+
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            DropdownMenuItem(
-                text = { Text("Classic") },
-                onClick = {
-                    onModeSelected(ChatLayoutMode.CLASSIC)
-                    expanded = false
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("Compact") },
-                onClick = {
-                    onModeSelected(ChatLayoutMode.COMPACT)
-                    expanded = false
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("Beehive") },
-                onClick = {
-                    onModeSelected(ChatLayoutMode.BEEHIVE)
-                    expanded = false
-                }
-            )
+            ChatLayoutMode.entries.forEach { mode ->
+                DropdownMenuItem(
+                    text = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            if (mode == currentMode) {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = null,
+                                    tint = colors.textPrimary
+                                )
+                            } else {
+                                Spacer(Modifier.size(24.dp))
+                            }
+
+                            Text(
+                                text = mode.name,
+                                fontWeight = if (mode == currentMode) FontWeight.Bold else FontWeight.Normal
+                            )
+                        }
+                    },
+                    onClick = {
+                        onModeSelected(mode)
+                        expanded = false
+                    }
+                )
+            }
         }
     }
 }
@@ -124,6 +143,7 @@ private fun ThemeModeMenu(
 ) {
     var expanded by remember { mutableStateOf(false) }
     val colors = LocalChatThemeColors.current
+
     Box {
         IconButton(onClick = { expanded = true }) {
             Icon(
@@ -132,31 +152,40 @@ private fun ThemeModeMenu(
                 tint = colors.appBarContent
             )
         }
+
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            DropdownMenuItem(
-                text = { Text("Light") },
-                onClick = {
-                    onModeSelected(ThemeMode.LIGHT)
-                    expanded = false
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("Dark") },
-                onClick = {
-                    onModeSelected(ThemeMode.DARK)
-                    expanded = false
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("High contrast") },
-                onClick = {
-                    onModeSelected(ThemeMode.HIGH_CONTRAST)
-                    expanded = false
-                }
-            )
+            ThemeMode.entries.forEach { mode ->
+                DropdownMenuItem(
+                    text = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            if (mode == currentMode) {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = null,
+                                    tint = colors.textPrimary
+                                )
+                            } else {
+                                Spacer(Modifier.size(24.dp))
+                            }
+
+                            Text(
+                                text = mode.name,
+                                fontWeight = if (mode == currentMode) FontWeight.Bold else FontWeight.Normal
+                            )
+                        }
+                    },
+                    onClick = {
+                        onModeSelected(mode)
+                        expanded = false
+                    }
+                )
+            }
         }
     }
 }
