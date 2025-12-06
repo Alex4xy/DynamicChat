@@ -54,7 +54,7 @@ fun BeehiveChatLayout(
     Box(
         modifier = modifier
             .verticalScroll(scrollState)
-            .padding(contentPadding) // Apply padding here
+            .padding(contentPadding)
     ) {
         BeehiveLayout(
             messages = messages,
