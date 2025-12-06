@@ -31,8 +31,8 @@ import androidx.compose.ui.unit.dp
 import com.alex.dynamicchat.R
 import com.alex.dynamicchat.core.network.NetworkStatus
 import com.alex.dynamicchat.core.providers.ResourceProvider
-import com.alex.dynamicchat.features.chat.presentation.ui.modes.ChatLayoutMode
-import com.alex.dynamicchat.features.chat.presentation.ui.modes.ThemeMode
+import com.alex.dynamicchat.features.chat.presentation.ui.theme.modes.ChatLayoutMode
+import com.alex.dynamicchat.features.chat.presentation.ui.theme.modes.ThemeMode
 import com.alex.dynamicchat.features.chat.presentation.ui.theme.LocalChatThemeColors
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -101,7 +101,8 @@ private fun LayoutModeMenu(
 
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
+            containerColor = colors.menuBackground
         ) {
             ChatLayoutMode.entries.forEach { mode ->
                 DropdownMenuItem(
@@ -114,7 +115,7 @@ private fun LayoutModeMenu(
                                 Icon(
                                     imageVector = Icons.Default.Check,
                                     contentDescription = null,
-                                    tint = colors.textPrimary
+                                    tint = colors.menuItemText
                                 )
                             } else {
                                 Spacer(Modifier.size(24.dp))
@@ -122,7 +123,8 @@ private fun LayoutModeMenu(
 
                             Text(
                                 text = mode.name,
-                                fontWeight = if (mode == currentMode) FontWeight.Bold else FontWeight.Normal
+                                fontWeight = if (mode == currentMode) FontWeight.Bold else FontWeight.Normal,
+                                color = colors.menuItemText
                             )
                         }
                     },
@@ -155,7 +157,8 @@ private fun ThemeModeMenu(
 
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
+            containerColor = colors.menuBackground
         ) {
             ThemeMode.entries.forEach { mode ->
                 DropdownMenuItem(
@@ -168,7 +171,7 @@ private fun ThemeModeMenu(
                                 Icon(
                                     imageVector = Icons.Default.Check,
                                     contentDescription = null,
-                                    tint = colors.textPrimary
+                                    tint = colors.menuItemText
                                 )
                             } else {
                                 Spacer(Modifier.size(24.dp))
@@ -176,7 +179,8 @@ private fun ThemeModeMenu(
 
                             Text(
                                 text = mode.name,
-                                fontWeight = if (mode == currentMode) FontWeight.Bold else FontWeight.Normal
+                                fontWeight = if (mode == currentMode) FontWeight.Bold else FontWeight.Normal,
+                                color = colors.menuItemText
                             )
                         }
                     },

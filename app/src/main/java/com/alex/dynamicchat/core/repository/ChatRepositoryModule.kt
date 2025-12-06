@@ -1,6 +1,7 @@
-package com.alex.dynamicchat.features.chat.data.repository
+package com.alex.dynamicchat.core.repository
 
-import com.alex.dynamicchat.features.chat.domain.repository.ChatRepositoryImpl
+import com.alex.dynamicchat.features.chat.data.repository.ChatRepositoryImpl
+import com.alex.dynamicchat.features.chat.domain.repository.ChatRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

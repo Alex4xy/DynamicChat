@@ -1,6 +1,7 @@
 package com.alex.dynamicchat.features.chat.presentation.ui.layouts.compact
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,10 +15,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.alex.dynamicchat.features.chat.presentation.ui.models.MessageUi
+import com.alex.dynamicchat.features.chat.presentation.ui.theme.LocalChatThemeColors
 import com.alex.dynamicchat.ui.Dimensions.paddingSmall
-import com.alex.dynamicchat.ui.theme.DeepBlue
-import com.alex.dynamicchat.ui.theme.StormGray
-import com.alex.dynamicchat.ui.theme.White
 
 @Composable
 fun CompactMessageBubble(
@@ -25,9 +24,13 @@ fun CompactMessageBubble(
     showSenderHeader: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val bubbleColor = if (message.isMe) DeepBlue else StormGray
-    val alignment =
-        if (message.isMe) Arrangement.End else Arrangement.Start
+    val colors = LocalChatThemeColors.current
+
+    val isMe = message.isMe
+    val bubbleColor = if (isMe) colors.bubbleMe else colors.bubbleOther
+    val alignment = if (isMe) Arrangement.End else Arrangement.Start
+    val headerColor = if (isMe) colors.bubbleMeText else colors.bubbleOtherText
+    val textColor = headerColor
 
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -36,6 +39,11 @@ fun CompactMessageBubble(
         Column(
             modifier = Modifier
                 .widthIn(max = 280.dp)
+                .border(
+                    width = 2.dp,
+                    color = colors.bubbleBorder,
+                    shape = RoundedCornerShape(12.dp)
+                )
                 .background(
                     color = bubbleColor,
                     shape = RoundedCornerShape(12.dp)
@@ -46,13 +54,13 @@ fun CompactMessageBubble(
                 Text(
                     text = message.senderName,
                     style = MaterialTheme.typography.labelSmall,
-                    color = White.copy(alpha = 0.7f)
+                    color = headerColor
                 )
             }
             Text(
                 text = message.text,
                 style = MaterialTheme.typography.bodySmall,
-                color = White
+                color = textColor
             )
         }
     }

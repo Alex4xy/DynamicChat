@@ -2,6 +2,7 @@ package com.alex.dynamicchat.features.chat.presentation.ui.layouts.beehive
 
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,7 +31,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.alex.dynamicchat.features.chat.presentation.ui.DateUtils
+import com.alex.dynamicchat.features.chat.presentation.utils.DateUtils
 import com.alex.dynamicchat.features.chat.presentation.ui.models.MessageUi
 import com.alex.dynamicchat.features.chat.presentation.ui.theme.LocalChatThemeColors
 import com.alex.dynamicchat.ui.Dimensions.paddingMedium
@@ -104,11 +105,17 @@ private fun HexTile(
     modifier: Modifier = Modifier
 ) {
     val colors = LocalChatThemeColors.current
-    val backgroundColor = if (message.isMe) colors.bubbleMe else colors.bubbleOther
+    val isMe = message.isMe
+
+    val backgroundColor = if (isMe) colors.bubbleMe else colors.bubbleOther
+    val nameColor = if (isMe) colors.bubbleMeText else colors.bubbleOtherText
+    val textColor = nameColor
+    val timeColor = if (isMe) colors.bubbleMeTimestamp else colors.bubbleOtherTimestamp
 
     Box(
         modifier = modifier
             .size(150.dp)
+            .border(2.dp, colors.bubbleBorder, HexagonShape)
             .clip(HexagonShape)
             .background(backgroundColor)
             .clickable(onClick = onClick)
@@ -117,7 +124,7 @@ private fun HexTile(
         Text(
             text = message.senderName,
             style = MaterialTheme.typography.labelSmall,
-            color = colors.textPrimary,
+            color = nameColor,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             textAlign = TextAlign.Center,
@@ -136,7 +143,7 @@ private fun HexTile(
             Text(
                 text = message.text,
                 style = MaterialTheme.typography.bodySmall,
-                color = colors.textPrimary,
+                color = textColor,
                 textAlign = TextAlign.Center,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
@@ -148,7 +155,7 @@ private fun HexTile(
             Text(
                 text = DateUtils.formatTime(message.timestamp),
                 style = MaterialTheme.typography.labelSmall,
-                color = colors.textSecondary,
+                color = timeColor,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -161,7 +168,7 @@ private fun HexTile(
                     .offset(x = (-6).dp, y = 6.dp)
                     .size(8.dp)
                     .clip(CircleShape)
-                    .background(colors.textPrimary)
+                    .background(colors.unread)
             )
         }
     }
