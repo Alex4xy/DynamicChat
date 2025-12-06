@@ -1,6 +1,7 @@
 package com.alex.dynamicchat.features.chat.presentation.ui.layouts.compact
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,14 +18,16 @@ import com.alex.dynamicchat.ui.Dimensions.paddingSmall
 fun CompactChatLayout(
     messages: List<MessageUi>,
     modifier: Modifier = Modifier,
-    listState: LazyListState
+    listState: LazyListState,
+    contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = paddingMedium, vertical = paddingSmall),
         verticalArrangement = Arrangement.spacedBy(2.dp),
-        state = listState
+        state = listState,
+        contentPadding = contentPadding
     ) {
         itemsIndexed(
             items = messages,

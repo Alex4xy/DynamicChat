@@ -222,8 +222,8 @@ class ChatViewModel @Inject constructor(
         if (text.isEmpty()) return
 
         launchIoSafe {
-            if (_state.value !is ChatState.Sending) {
-                launchMainSafe { _state.value = ChatState.Sending }
+            launchMainSafe {
+                _state.value = ChatState.Sending
             }
 
             val now = System.currentTimeMillis()
@@ -240,12 +240,12 @@ class ChatViewModel @Inject constructor(
 
             launchMainSafe {
                 _messages.value = _messages.value + message.toUi()
+                _messageInput.value = ""
             }
 
             when (val result = chatUseCases.sendMessage(message)) {
                 is StateResource.Success -> {
                     launchMainSafe {
-                        _messageInput.value = ""
                         _state.value = ChatState.Idle
                     }
                 }

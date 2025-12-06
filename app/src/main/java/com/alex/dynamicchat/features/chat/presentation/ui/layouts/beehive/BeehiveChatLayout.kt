@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -43,14 +44,17 @@ import kotlinx.coroutines.launch
 fun BeehiveChatLayout(
     messages: List<MessageUi>,
     modifier: Modifier = Modifier,
-    scrollState: ScrollState
+    scrollState: ScrollState,
+    contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     var selectedMessage by remember { mutableStateOf<MessageUi?>(null) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
 
     Box(
-        modifier = modifier.verticalScroll(scrollState)
+        modifier = modifier
+            .verticalScroll(scrollState)
+            .padding(contentPadding) // Apply padding here
     ) {
         BeehiveLayout(
             messages = messages,
@@ -59,6 +63,7 @@ fun BeehiveChatLayout(
             HexTile(message = msg, onClick = { selectedMessage = msg })
         }
     }
+
     selectedMessage?.let { message ->
         ModalBottomSheet(
             sheetState = sheetState,
