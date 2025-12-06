@@ -1,296 +1,264 @@
-🗨️ DynamicChat
-Dynamic Chat Layouts & Theming with Real-Time Messaging (Jetpack Compose)
+# 🗨️ DynamicChat
 
-Android Application Development — Assignment Project
+> A modern Android messaging application featuring dynamic layouts, Material 3 theming, and real-time WebSocket communication built with Jetpack Compose.
 
-📖 Overview
+---
 
-DynamicChat is a modern messaging app built with Jetpack Compose, supporting:
+## 📖 Overview
 
-Multiple layout modes (Classic, Compact, Beehive/Hex)
+**DynamicChat** is a feature-rich messaging app showcasing modern Android development best practices with clean architecture, reactive state management, and beautiful UI design.
 
-Dynamic Material 3 theming (Light, Dark, High Contrast)
+### Key Highlights
 
-Real-time messaging over a public WebSocket server
+- **Multiple Layout Modes:** Classic bubbles, compact view, and innovative hexagonal (Beehive) layout
+- **Dynamic Material 3 Theming:** Light, Dark, and High Contrast modes with full component theming
+- **Real-Time Messaging:** WebSocket-powered instant communication
+- **Clean Architecture:** Multi-layer separation with clear dependency flow
+- **Reactive State:** StateFlow-based state management for predictable UI updates
+- **Custom UI Components:** Hand-crafted hexagon shapes and layout algorithms
 
-A clean multi-layer architecture
+---
 
-Reactive state with StateFlow
+## 🚀 Quick Start
 
-Custom shapes and layouts (Hexagon tiles)
+### Clone the Repository
 
-This project demonstrates advanced UI techniques, architecture, and real-time communication — fully satisfying all assignment requirements.
-
-🔗 Clone the Repository
-
-HTTPS
-
+**HTTPS:**
+```bash
 git clone https://github.com/Alex4xy/DynamicChat.git
+```
 
-
-SSH
-
+**SSH:**
+```bash
 git clone git@github.com:Alex4xy/DynamicChat.git
+```
 
-🧱 Project Structure
-High-Level Architecture View
-app/
-└── src/main/java/com/alex/dynamicchat
-├── core/                # Shared app-level components
-│    ├── app/            # App.kt, MainActivity, BaseViewModel
-│    ├── coroutine/      # Dispatcher modules
-│    ├── navigation/     # NavGraph
-│    ├── network/        # Connectivity observer
-│    ├── providers/      # ResourceProvider
-│    ├── repository/     # DI bindings
-│    └── usecase/        # Base UseCase
+### Run the App
+
+1. Open the project in **Android Studio Hedgehog** or newer
+2. Click **Run ▶**
+3. The app connects automatically to the WebSocket server
+
+---
+
+## 🏗️ Architecture
+
+### Project Structure
+
+```
+app/src/main/java/com/alex/dynamicchat/
 │
-├── features/
-│    └── chat/
-│         ├── data/      
-│         │    ├── local/         # DataStore for theme/layout
-│         │    ├── network/       # WebSocket client (OkHttp)
-│         │    ├── dto/           # Message DTO
-│         │    └── repository/    # ChatRepositoryImpl
-│         │
-│         ├── domain/
-│         │    ├── model/         # Message, ConnectionState, WebSocketError
-│         │    ├── repository/    # ChatRepository interface
-│         │    └── usecase/       # Connect/Disconnect/Observe/Send use cases
-│         │
-│         └── presentation/
-│              ├── event/         # ChatEvent
-│              ├── state/         # ChatState, EmptyState
-│              ├── ui/            
-│              │    ├── components/   # TopBar, InputBar
-│              │    ├── layouts/      # Classic, Compact, Beehive
-│              │    ├── models/       # MessageUi mapper
-│              │    ├── screen/       # ChatScreen (main UI)
-│              │    └── theme/        # ChatThemeColors + Modes
-│              └── viewmodel/         # ChatViewModel
+├── core/                           # Shared application components
+│   ├── app/                        # Application class, MainActivity, BaseViewModel
+│   ├── coroutine/                  # Coroutine dispatcher modules
+│   ├── navigation/                 # Navigation graph configuration
+│   ├── network/                    # Network monitoring & OkHttp setup
+│   ├── providers/                  # Resource provider utilities
+│   ├── repository/                 # Repository DI bindings
+│   └── usecase/                    # Base use case abstractions
 │
-└── ui/theme/    # Global M3 theme (colors, typography)
+├── features/chat/
+│   │
+│   ├── data/                       # Data layer
+│   │   ├── local/                  # DataStore (preferences storage)
+│   │   ├── network/
+│   │   │   ├── client/             # WebSocket client implementation
+│   │   │   └── dto/                # Data transfer objects
+│   │   └── repository/             # Repository implementation
+│   │
+│   ├── domain/                     # Business logic layer
+│   │   ├── model/                  # Domain models
+│   │   ├── repository/             # Repository interface
+│   │   └── usecase/                # Use cases (Connect, Send, Observe)
+│   │
+│   └── presentation/               # UI layer
+│       ├── event/                  # User interaction events
+│       ├── state/                  # UI state definitions
+│       ├── ui/
+│       │   ├── components/         # Reusable UI components
+│       │   ├── layouts/            # Layout mode implementations
+│       │   ├── models/             # UI-specific models
+│       │   ├── screen/             # Main chat screen
+│       │   └── theme/              # Theme configuration
+│       └── viewmodel/              # ViewModel implementation
+│
+└── ui/theme/                       # Global Material 3 theme
+```
+
+### Clean Architecture Layers
+
+- **Presentation:** Jetpack Compose UI, ViewModels, UI events
+- **Domain:** Business logic, use cases, domain models
+- **Data:** Repository implementations, WebSocket client, local storage
+
+---
+
+## ✨ Features
+
+### 🎨 Layout Modes
+
+#### Classic Layout
+- Traditional chat bubbles with left/right alignment
+- Sender names and timestamps
+- Unread message indicators
+- Optimal for standard messaging experience
+
+#### Compact Layout
+- Space-efficient design with reduced padding
+- Grouped consecutive messages from same sender
+- Smaller typography for information density
+- Perfect for quick scanning
+
+#### Beehive Layout
+- Unique hexagonal tile design
+- Offset-row honeycomb pattern
+- Tap-to-expand functionality
+- Center-aligned content
+- Eye-catching visual experience
+
+### 🌈 Dynamic Theming
+
+All themes support complete UI customization across every component.
+
+#### Light Theme
+- Soft neutral backgrounds
+- High-contrast readable text
+- Blue sender bubbles, gray recipient bubbles
+- Clean, professional appearance
+
+#### Dark Theme
+- Deep navy background
+- Blue and storm-gray message bubbles
+- White text for excellent readability
+- Easy on the eyes in low-light conditions
+
+#### High Contrast Theme
+- Pure black background
+- Intense yellow text for maximum visibility
+- Bold bubble contrast
+- Designed for accessibility
+- WCAG-compliant color ratios
+
+**Theme affects:**
+- Background colors
+- Message bubble colors
+- Text (primary/secondary)
+- Timestamp visibility
+- Hexagonal tile colors
+- Input bar styling
+- Top app bar
+- Button states
+
+### 🌐 Real-Time Messaging
+
+**WebSocket Server:** `wss://ws.postman-echo.com/raw`
+
+**Message Flow:**
+1. Connect via `ChatWebSocketClient`
+2. Monitor connection states: `Connecting → Connected → Closed/Error`
+3. Send messages through input bar
+4. Messages render immediately (optimistic UI)
+5. Server echoes messages back
+6. Data flows: `MessageDto → Domain Model → UI Model`
+7. Display updates across all active layouts
 
-🎨 Features
-✔ Multiple Layout Modes
+**Benefits:**
+- No proprietary APIs required
+- Public server for testing
+- Real bidirectional communication
+- Open WebSocket protocol
 
-Classic Layout (LazyColumn, bubbles, timestamps)
+---
 
-Compact Layout (Grouped messages, reduced padding)
+## 🔧 Technology Stack
 
-Beehive Layout (Custom hexagonal tile layout & shape)
+### UI & Compose
+- **Jetpack Compose** - Modern declarative UI toolkit
+- **Material 3** - Latest Material Design components
+- **Compose Navigation** - Type-safe navigation
+- **Custom Layouts** - Hand-built Beehive layout algorithm
+- **Custom Shapes** - HexagonShape implementation
 
-✔ Dynamic Material 3 Theming
+### Architecture & State Management
+- **AndroidX ViewModel** - Lifecycle-aware state holders
+- **Kotlin Coroutines** - Asynchronous programming
+- **StateFlow/SharedFlow** - Reactive state streams
+- **DataStore Preferences** - Modern data persistence
+- **Clean Architecture** - Separation of concerns
 
-Light
+### Networking
+- **OkHttp WebSocket** - Efficient WebSocket implementation
+- **OkHttp Logging Interceptor** - Network debugging
 
-Dark
+### Dependency Injection
+- **Hilt (Dagger)** - Compile-time DI framework
 
-High Contrast (Accessibility)
+---
 
-Theme changes affect:
+## 🧠 State Management
 
-Backgrounds
+### Reactive Architecture
 
-Bubble colors
+```kotlin
+// Single source of truth
+StateFlow<ChatState> // Reactive UI state
+SharedFlow<Event>    // One-time events (errors, navigation)
+```
 
-Text colors
+**State Components:**
+- Message list with ordering
+- Current input text
+- Selected layout mode
+- Active theme mode
+- WebSocket connection status
+- Send/error indicators
 
-Timestamps
+**Persistence:**
+- Layout preferences saved to DataStore
+- Theme preferences saved to DataStore
+- Automatic restoration on app restart
 
-Hex tiles
+---
 
-App bar + input bar
+## ⚡ Performance Optimizations
 
-Buttons & icons
+- **Efficient Recomposition:** StateFlow updates trigger minimal recomposition
+- **Smart Layout Measurement:** Custom layouts minimize remeasure overhead
+- **Backpressure Control:** SharedFlow with replay for controlled event emission
+- **Async Storage:** DataStore operations never block main thread
+- **Lazy Loading:** LazyColumn for efficient list rendering
 
-✔ Real-Time Messaging
+---
 
-Using OkHttp WebSockets:
+## 📚 Assignment Compliance
 
-wss://ws.postman-echo.com/raw
+✅ Multiple chat layouts implemented  
+✅ Dynamic theming with Material 3  
+✅ Real-time messaging platform integration  
+✅ Clean multi-layer architecture  
+✅ Modern state management  
+✅ Custom UI components (shapes + layouts)  
+✅ Dependency injection  
+✅ Persistent user preferences
 
+---
 
-The app communicates with an open echo server that responds in real time.
+## 📄 License
 
-🌐 Messaging Platform Integration
+This project was created as an academic assignment for Android Application Development.
 
-The app uses a public open WebSocket protocol — meeting assignment requirements for integrating with an open messaging platform.
+---
 
-Workflow:
+## 👨‍💻 Author
 
-Connect using ChatWebSocketClient
+**Alex4xy**  
+[GitHub Profile](https://github.com/Alex4xy)
 
-Observe connection state (Connecting → Connected → Closed/Error)
+---
 
-Send message via WebSocket
+## 🙏 Acknowledgments
 
-Receive echoed messages
-
-Convert DTO → Domain → UI models
-
-Render in all layout modes
-
-🧠 State Management
-
-The app uses:
-
-StateFlow for reactive state streams
-
-MutableStateFlow inside ChatViewModel
-
-DataStore for layout/theme persistence
-
-SharedFlow for real-time WebSocket events
-
-ViewModel state includes:
-
-Messages
-
-Input text
-
-Layout mode
-
-Theme mode
-
-Connection state
-
-Sending/error states
-
-📚 Libraries & Technologies Used
-UI / Jetpack Compose
-
-Jetpack Compose
-
-Material 3
-
-Compose Navigation
-
-Custom Layouts (Beehive)
-
-Custom Shapes (HexagonShape)
-
-Architecture & State
-
-AndroidX ViewModel
-
-Kotlin Coroutines & StateFlow
-
-DataStore Preferences
-
-Clean Architecture (Domain / Data / Presentation)
-
-Networking
-
-OkHttp (WebSocket)
-
-OkHttp Logging Interceptor
-
-Dependency Injection
-
-Hilt (Dagger)
-
-🎨 Theming Details
-Light Theme
-
-Soft neutral background
-
-High-contrast text
-
-Blue “Me” bubbles, gray “Other” bubbles
-
-Dark Theme
-
-Deep navy background
-
-Blue and storm-gray bubbles
-
-White text with subtle secondary tones
-
-High Contrast Theme
-
-Black background
-
-Yellow primary & secondary text
-
-Strong bubble contrast
-
-Adjusted hex tiles for visibility
-
-🧩 Layout Details
-1️⃣ Classic Chat Layout
-
-LazyColumn
-
-Left/right bubble alignment
-
-Sender name, message text, timestamps
-
-Unread indicators
-
-2️⃣ Compact Layout
-
-Tighter spacing
-
-Smaller typography
-
-Grouped sender headers
-
-3️⃣ Beehive / Hexagonal Layout
-
-Custom-built using:
-
-HexagonShape (custom Path shape)
-
-Custom arrangement logic (offset hex rows)
-
-Centered text
-
-Tap to expand message
-
-Not a LazyVerticalGrid — true custom layout.
-
-⚙️ How to Run
-
-Clone the project:
-
-git clone https://github.com/Alex4xy/DynamicChat.git
-
-
-Open in Android Studio Hedgehog or newer
-
-Click Run ▶
-
-Chat will auto-connect to the WebSocket server.
-
-🚀 Performance Considerations
-
-StateFlow used for efficient Compose recomposition
-
-Custom layouts optimized to minimize remeasure
-
-DataStore use is async & non-blocking
-
-WebSocket streams use backpressure-friendly SharedFlow
-
-UI recomposes only when relevant state changes
-
-🏁 Summary
-
-DynamicChat demonstrates:
-
-✔ Multi-layout chat UI (Classic, Compact, Beehive)
-
-✔ Dynamic Material 3 theming
-
-✔ Real-time WebSocket messaging
-
-✔ Clean Architecture structure
-
-✔ Modern state management with StateFlow
-
-✔ Custom layouts + custom shapes
-
-✔ DI with Hilt
-
-✔ Persistent UI settings (DataStore)
+- Jetpack Compose team for the amazing UI toolkit
+- OkHttp contributors for robust networking
+- Material Design team for design system guidance
+- Postman for providing the public WebSocket echo server
