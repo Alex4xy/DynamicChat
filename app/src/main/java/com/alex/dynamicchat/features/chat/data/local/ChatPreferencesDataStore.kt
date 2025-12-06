@@ -5,8 +5,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.alex.dynamicchat.core.app.chatDataStore
 import com.alex.dynamicchat.core.corotuine.DefaultDispatcher
-import com.alex.dynamicchat.features.chat.presentation.ui.modes.ChatLayoutMode
-import com.alex.dynamicchat.features.chat.presentation.ui.modes.ThemeMode
+import com.alex.dynamicchat.features.chat.presentation.ui.theme.modes.ChatLayoutMode
+import com.alex.dynamicchat.features.chat.presentation.ui.theme.modes.ThemeMode
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow

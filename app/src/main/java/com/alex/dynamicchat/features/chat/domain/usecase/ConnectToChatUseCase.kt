@@ -1,0 +1,12 @@
+package com.alex.dynamicchat.features.chat.domain.usecase
+
+import com.alex.dynamicchat.features.chat.domain.repository.ChatRepository
+import javax.inject.Inject
+
+class ConnectToChatUseCase @Inject constructor(
+    private val repository: ChatRepository
+) {
+    operator fun invoke() {
+        repository.connect()
+    }
+}

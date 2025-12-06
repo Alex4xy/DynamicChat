@@ -1,9 +1,11 @@
 package com.alex.dynamicchat.features.chat.data.network.client
 
+import com.alex.dynamicchat.features.chat.domain.model.ConnectionEvent
+import com.alex.dynamicchat.features.chat.domain.model.ConnectionState
+import com.alex.dynamicchat.features.chat.domain.model.WebSocketError
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -23,29 +25,32 @@ class ChatWebSocketClient(
         extraBufferCapacity = 64,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
-    val incomingMessages: SharedFlow<String> = _incomingMessages.asSharedFlow()
+    val incomingMessages: SharedFlow<String> = _incomingMessages
 
     private val _connectionEvents = MutableSharedFlow<ConnectionEvent>(
         replay = 1,
         extraBufferCapacity = 16,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
-    val connectionEvents: SharedFlow<ConnectionEvent> = _connectionEvents.asSharedFlow()
+    val connectionEvents: SharedFlow<ConnectionEvent> = _connectionEvents
 
     @Volatile
-    private var connectionState = ConnectionState.DISCONNECTED
+    private var connectionState: ConnectionState = ConnectionState.DISCONNECTED
 
-    sealed class ConnectionEvent {
-        object Connecting : ConnectionEvent()
-        object Connected : ConnectionEvent()
-        data class Error(val message: String) : ConnectionEvent()
-        data class Closed(val reason: String) : ConnectionEvent()
-    }
+    fun send(message: String) {
+        val ws = webSocket ?: run {
+            _connectionEvents.tryEmit(ConnectionEvent.Error(WebSocketError.NullSocket))
+            return
+        }
 
-    enum class ConnectionState {
-        DISCONNECTED,
-        CONNECTING,
-        CONNECTED
+        if (connectionState != ConnectionState.CONNECTED) {
+            _connectionEvents.tryEmit(ConnectionEvent.Error(WebSocketError.NotReady))
+            return
+        }
+
+        if (!ws.send(message)) {
+            _connectionEvents.tryEmit(ConnectionEvent.Error(WebSocketError.SendFailed))
+        }
     }
 
     fun connect(url: String) {
@@ -62,36 +67,19 @@ class ChatWebSocketClient(
             webSocket = okHttpClient.newWebSocket(request, this)
         } catch (e: Exception) {
             connectionState = ConnectionState.DISCONNECTED
-            _connectionEvents.tryEmit(ConnectionEvent.Error(e.message ?: "Connection failed"))
-        }
-    }
-
-    fun send(message: String) {
-        val ws = webSocket ?: run {
-            _connectionEvents.tryEmit(ConnectionEvent.Error("Not connected"))
-            return
-        }
-
-        if (connectionState != ConnectionState.CONNECTED) {
-            _connectionEvents.tryEmit(ConnectionEvent.Error("Connection not ready"))
-            return
-        }
-
-        if (!ws.send(message)) {
-            _connectionEvents.tryEmit(ConnectionEvent.Error("Failed to send"))
+            _connectionEvents.tryEmit(ConnectionEvent.Error(WebSocketError.Unknown(e)))
         }
     }
 
     fun disconnect() {
+        val ws = webSocket
         connectionState = ConnectionState.DISCONNECTED
-        webSocket?.close(1000, "Client closing")
+        ws?.close(1000, "Client closing")
         webSocket = null
     }
 
-    fun isConnected(): Boolean =
-        connectionState == ConnectionState.CONNECTED
-
     override fun onOpen(webSocket: WebSocket, response: Response) {
+        this.webSocket = webSocket
         connectionState = ConnectionState.CONNECTED
         _connectionEvents.tryEmit(ConnectionEvent.Connected)
     }
@@ -117,7 +105,7 @@ class ChatWebSocketClient(
 
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
         connectionState = ConnectionState.DISCONNECTED
-        _connectionEvents.tryEmit(ConnectionEvent.Error(t.message ?: "Unknown error"))
         this.webSocket = null
+        _connectionEvents.tryEmit(ConnectionEvent.Error(WebSocketError.Unknown(t)))
     }
 }

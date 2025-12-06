@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -31,15 +32,15 @@ import com.alex.dynamicchat.core.network.NetworkStatus
 import com.alex.dynamicchat.core.providers.ResourceProvider
 import com.alex.dynamicchat.features.chat.presentation.event.ChatEvent
 import com.alex.dynamicchat.features.chat.presentation.state.ChatState
-import com.alex.dynamicchat.features.chat.presentation.ui.ChatEmptyState
+import com.alex.dynamicchat.features.chat.presentation.state.ChatEmptyState
 import com.alex.dynamicchat.features.chat.presentation.ui.components.ChatTopBar
 import com.alex.dynamicchat.features.chat.presentation.ui.layouts.beehive.BeehiveChatLayout
 import com.alex.dynamicchat.features.chat.presentation.ui.layouts.classic.ClassicChatLayout
 import com.alex.dynamicchat.features.chat.presentation.ui.layouts.compact.CompactChatLayout
-import com.alex.dynamicchat.features.chat.presentation.ui.modes.ChatLayoutMode
+import com.alex.dynamicchat.features.chat.presentation.ui.theme.modes.ChatLayoutMode
 import com.alex.dynamicchat.features.chat.presentation.ui.theme.LocalChatThemeColors
 import com.alex.dynamicchat.features.chat.presentation.ui.theme.chatColorsFor
-import com.alex.dynamicchat.features.chat.presentation.viewmodel.ChatViewModel
+import com.alex.dynamicchat.features.chat.presentation.ui.viewmodel.ChatViewModel
 import com.alex.dynamicchat.ui.Dimensions.paddingMedium
 import com.alex.dynamicchat.ui.Dimensions.paddingSmall
 
@@ -177,7 +178,7 @@ fun MessageInputBar(
             placeholder = {
                 Text(
                     text = resourceProvider.getString(R.string.chat_input_placeholder),
-                    color = colors.textSecondary
+                    color = colors.inputPlaceholder
                 )
             },
             singleLine = true,
@@ -185,19 +186,25 @@ fun MessageInputBar(
                 focusedTextColor = colors.textPrimary,
                 unfocusedTextColor = colors.textPrimary,
                 cursorColor = colors.textPrimary,
-                focusedBorderColor = colors.textSecondary,
-                unfocusedBorderColor = colors.textSecondary.copy(alpha = 0.5f),
-                focusedPlaceholderColor = colors.textSecondary,
-                unfocusedPlaceholderColor = colors.textSecondary
+                focusedBorderColor = colors.inputBorder,
+                unfocusedBorderColor = colors.inputBorder.copy(alpha = 0.5f),
+                focusedPlaceholderColor = colors.inputPlaceholder,
+                unfocusedPlaceholderColor = colors.inputPlaceholder,
             )
         )
         Button(
             onClick = onSendClicked,
-            enabled = isEnabled
+            enabled = isEnabled,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = colors.buttonBackground,
+                contentColor = colors.buttonText,
+                disabledContainerColor = colors.buttonBackground.copy(alpha = 0.4f),
+                disabledContentColor = colors.buttonText.copy(alpha = 0.4f),
+            )
         ) {
             Text(
                 text = resourceProvider.getString(R.string.chat_send),
-                color = colors.textPrimary
+                color = colors.buttonText
             )
         }
     }
