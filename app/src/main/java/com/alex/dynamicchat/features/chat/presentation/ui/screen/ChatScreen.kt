@@ -6,9 +6,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,6 +29,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.ImeAction
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.alex.dynamicchat.R
 import com.alex.dynamicchat.core.network.NetworkStatus
@@ -89,12 +95,10 @@ fun ChatScreen() {
     CompositionLocalProvider(LocalChatThemeColors provides chatColors) {
         val colors = LocalChatThemeColors.current
 
-        val isSending = chatState is ChatState.Sending
         val isError = chatState is ChatState.Error
         val isNetworkAvailable = networkStatus == NetworkStatus.Available
 
         val canSend = inputText.isNotBlank() &&
-                !isSending &&
                 isNetworkAvailable &&
                 !isError
 
@@ -124,27 +128,34 @@ fun ChatScreen() {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues)
                     .background(colors.background)
             ) {
                 if (messages.isEmpty()) {
-                    ChatEmptyState(resourceProvider = resourceProvider)
+                    ChatEmptyState(
+                        resourceProvider = resourceProvider,
+                        modifier = Modifier.padding(paddingValues)
+                    )
                 } else {
                     when (layoutMode) {
                         ChatLayoutMode.CLASSIC -> ClassicChatLayout(
                             messages = messages,
                             modifier = Modifier.fillMaxSize(),
-                            listState = classicListState
+                            listState = classicListState,
+                            contentPadding = paddingValues
                         )
+
                         ChatLayoutMode.COMPACT -> CompactChatLayout(
                             messages = messages,
                             modifier = Modifier.fillMaxSize(),
-                            listState = compactListState
+                            listState = compactListState,
+                            contentPadding = paddingValues
                         )
+
                         ChatLayoutMode.BEEHIVE -> BeehiveChatLayout(
                             messages = messages,
                             modifier = Modifier.fillMaxSize(),
-                            scrollState = beehiveScrollState
+                            scrollState = beehiveScrollState,
+                            contentPadding = paddingValues
                         )
                     }
                 }
@@ -163,10 +174,14 @@ fun MessageInputBar(
     modifier: Modifier = Modifier
 ) {
     val colors = LocalChatThemeColors.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
 
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .background(colors.background)
+            .navigationBarsPadding()
             .padding(horizontal = paddingMedium, vertical = paddingSmall),
         horizontalArrangement = Arrangement.spacedBy(paddingSmall),
         verticalAlignment = Alignment.CenterVertically
@@ -182,6 +197,16 @@ fun MessageInputBar(
                 )
             },
             singleLine = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
+            keyboardActions = KeyboardActions(
+                onSend = {
+                    if (isEnabled) {
+                        focusManager.clearFocus()
+                        keyboardController?.hide()
+                        onSendClicked()
+                    }
+                }
+            ),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = colors.textPrimary,
                 unfocusedTextColor = colors.textPrimary,
@@ -193,7 +218,11 @@ fun MessageInputBar(
             )
         )
         Button(
-            onClick = onSendClicked,
+            onClick = {
+                focusManager.clearFocus()
+                keyboardController?.hide()
+                onSendClicked()
+            },
             enabled = isEnabled,
             colors = ButtonDefaults.buttonColors(
                 containerColor = colors.buttonBackground,
